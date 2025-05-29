@@ -18,7 +18,8 @@ struct Node {
 type Link = Option<NonNull<Node>>;
 
 impl List {
-    fn new() -> Self {
+    /// Creates an empty list
+    pub fn new() -> Self {
         List {
             front: None,
             back: None,
@@ -27,52 +28,74 @@ impl List {
         }
     }
 
-    fn length(&self) -> usize {
+    /// Returns the length of the list
+    pub fn length(&self) -> usize {
         todo!()
     }
 
-    fn append(&mut self, elem: char) {
+    /// Appends `elem` to the back of the list
+    pub fn append(&mut self, elem: char) {
         todo!()
     }
 
-    fn insert(&mut self, elem: char, index: usize) -> Result<(), String> {
+    /// Inserts `elem` at position `index` of the list
+    /// # Errors
+    /// Returns an error if `index > len`
+    pub fn insert(&mut self, elem: char, index: usize) -> Result<(), String> {
         todo!()
     }
 
-    fn delete(&mut self, index: usize) -> Result<char, String> {
+    /// Deletes element at position `index` of the list
+    /// # Errors
+    /// Returns an error if `index` is out of bounds
+    pub fn delete(&mut self, index: usize) -> Result<char, String> {
         todo!()
     }
 
-    fn delete_all(&mut self, elem: char) {
+    /// Deletes all occurences of `elem` in the list
+    pub fn delete_all(&mut self, elem: char) {
         todo!()
     }
 
-    fn get(&self, index: usize) -> Result<char, String> {
+    /// Returns the element at position `index` of the list
+    /// # Errors
+    /// Returns an error if `index` is out of bounds
+    pub fn get(&self, index: usize) -> Result<char, String> {
         todo!()
     }
 
-    fn reverse(&self) {
+    /// Reverses the list
+    pub fn reverse(&self) {
         todo!()
     }
 
-    fn find_first(&self, elem: char) -> i64 {
+    /// Returns the position of the first occurrence of `elem` in the list
+    ///
+    /// If there were no occurrences of `elem`, returns `-1`
+    pub fn find_first(&self, elem: char) -> i64 {
         todo!()
     }
 
-    fn find_last(&self, elem: char) -> i64 {
+    /// Returns the position of the last occurrence of `elem` in the list
+    ///
+    /// If there were no occurrences of `elem`, returns `-1`
+    pub fn find_last(&self, elem: char) -> i64 {
         todo!()
     }
 
-    fn clear(&mut self) {
+    /// Removes all elements from the list
+    pub fn clear(&mut self) {
         todo!()
     }
 
-    fn extend(&mut self, other: &List) {
+    /// Copies all elements from `other` to the end of the list
+    pub fn extend(&mut self, other: &List) {
         todo!()
     }
 }
 
 impl Clone for List {
+    /// Returns a copy of the list
     fn clone(&self) -> Self {
         todo!()
     }
