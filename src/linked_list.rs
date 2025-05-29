@@ -1,6 +1,5 @@
-use std::{marker::PhantomData, ptr::NonNull};
+use std::{fmt::Debug, marker::PhantomData, ptr::NonNull};
 
-#[derive(Debug)]
 pub struct List {
     front: Link,
     back: Link,
@@ -8,7 +7,6 @@ pub struct List {
     marker: PhantomData<Box<Node>>,
 }
 
-#[derive(Debug)]
 struct Node {
     front: Link,
     back: Link,
@@ -257,6 +255,22 @@ impl Clone for List {
 impl Drop for List {
     fn drop(&mut self) {
         self.clear()
+    }
+}
+
+impl Debug for List {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        unsafe {
+            let mut elems = Vec::new();
+
+            let mut current_node = self.front;
+            while let Some(node) = current_node {
+                elems.push((*node.as_ptr()).elem);
+                current_node = (*node.as_ptr()).back;
+            }
+
+            f.debug_list().entries(&elems).finish()
+        }
     }
 }
 
