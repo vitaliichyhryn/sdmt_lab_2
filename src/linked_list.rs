@@ -30,74 +30,227 @@ impl List {
 
     /// Returns the length of the list
     pub fn length(&self) -> usize {
-        todo!()
+        self.len
     }
 
     /// Appends `elem` to the back of the list
     pub fn append(&mut self, elem: char) {
-        todo!()
+        unsafe {
+            let new_back = Box::new(Node {
+                front: None,
+                back: None,
+                elem,
+            });
+            let new_back = NonNull::new_unchecked(Box::into_raw(new_back));
+
+            if let Some(old_back) = self.back {
+                (*old_back.as_ptr()).back = Some(new_back);
+                (*new_back.as_ptr()).front = Some(old_back);
+            } else {
+                self.front = Some(new_back);
+            }
+
+            self.back = Some(new_back);
+            self.len += 1;
+        }
     }
 
     /// Inserts `elem` at position `index` of the list
     /// # Errors
     /// Returns an error if `index > len`
     pub fn insert(&mut self, elem: char, index: usize) -> Result<(), String> {
-        todo!()
+        unsafe {
+            if index > self.len {
+                return Err("Index out of bounds".to_owned());
+            }
+
+            let new_node = Box::new(Node {
+                front: None,
+                back: None,
+                elem,
+            });
+            let new_node = NonNull::new_unchecked(Box::into_raw(new_node));
+
+            let (front_node, back_node) = match index {
+                0 => (None, self.front),
+                _ if index == self.len => (self.back, None),
+                index => {
+                    let mut front_node = self.front.unwrap();
+                    for _ in 0..(index - 1) {
+                        front_node = (*front_node.as_ptr()).back.unwrap();
+                    }
+                    let back_node = (*front_node.as_ptr()).back.unwrap();
+                    (Some(front_node), Some(back_node))
+                }
+            };
+
+            (*new_node.as_ptr()).front = front_node;
+            (*new_node.as_ptr()).back = back_node;
+
+            if let Some(front_node) = front_node {
+                (*front_node.as_ptr()).back = Some(new_node);
+            } else {
+                self.front = Some(new_node);
+            }
+            if let Some(back_node) = back_node {
+                (*back_node.as_ptr()).front = Some(new_node);
+            } else {
+                self.back = Some(new_node);
+            }
+
+            self.len += 1;
+            Ok(())
+        }
     }
 
     /// Deletes element at position `index` of the list
     /// # Errors
     /// Returns an error if `index` is out of bounds
     pub fn delete(&mut self, index: usize) -> Result<char, String> {
-        todo!()
+        unsafe {
+            if index >= self.len {
+                return Err("Index out of bounds".to_owned());
+            }
+
+            let target_node = match index {
+                0 => self.front.unwrap(),
+                _ if index == self.len => self.back.unwrap(),
+                index => {
+                    let mut target_node = self.front.unwrap();
+                    for _ in 0..index {
+                        target_node = (*target_node.as_ptr()).back.unwrap();
+                    }
+                    target_node
+                }
+            };
+
+            let front_node = (*target_node.as_ptr()).front;
+            let back_node = (*target_node.as_ptr()).back;
+
+            if let Some(front_node) = front_node {
+                (*front_node.as_ptr()).back = back_node;
+            } else {
+                self.front = back_node;
+            }
+            if let Some(back_node) = back_node {
+                (*back_node.as_ptr()).front = front_node;
+            } else {
+                self.back = front_node;
+            }
+
+            let target_node = Box::from_raw(target_node.as_ptr());
+            self.len -= 1;
+            Ok(target_node.elem)
+        }
     }
 
     /// Deletes all occurences of `elem` in the list
     pub fn delete_all(&mut self, elem: char) {
-        todo!()
+        loop {
+            let index = self.find_first(elem);
+            if index == -1 {
+                break;
+            }
+            let _ = self.delete(index as usize);
+        }
     }
 
     /// Returns the element at position `index` of the list
     /// # Errors
     /// Returns an error if `index` is out of bounds
     pub fn get(&self, index: usize) -> Result<char, String> {
-        todo!()
+        unsafe {
+            if index >= self.len {
+                return Err("Index out of bounds".to_owned());
+            }
+
+            match index {
+                0 => Ok((*self.front.unwrap().as_ptr()).elem),
+                _ if index == self.len => Ok((*self.back.unwrap().as_ptr()).elem),
+                index => {
+                    let mut target_node = self.front.unwrap();
+                    for _ in 0..index {
+                        target_node = (*target_node.as_ptr()).back.unwrap();
+                    }
+                    Ok((*target_node.as_ptr()).elem)
+                }
+            }
+        }
     }
 
     /// Reverses the list
-    pub fn reverse(&self) {
-        todo!()
+    pub fn reverse(&mut self) {
+        unsafe {
+            std::mem::swap(&mut self.front, &mut self.back);
+            let mut current_node = self.front;
+            while let Some(node) = current_node {
+                std::mem::swap(&mut (*node.as_ptr()).front, &mut (*node.as_ptr()).back);
+                current_node = (*node.as_ptr()).back;
+            }
+        }
     }
 
     /// Returns the position of the first occurrence of `elem` in the list
     ///
     /// If there were no occurrences of `elem`, returns `-1`
     pub fn find_first(&self, elem: char) -> i64 {
-        todo!()
+        unsafe {
+            let mut current_node = self.front;
+            let mut index = 0;
+
+            while let Some(node) = current_node {
+                if (*node.as_ptr()).elem == elem {
+                    return index;
+                }
+                current_node = (*node.as_ptr()).back;
+                index += 1
+            }
+            -1
+        }
     }
 
     /// Returns the position of the last occurrence of `elem` in the list
     ///
     /// If there were no occurrences of `elem`, returns `-1`
     pub fn find_last(&self, elem: char) -> i64 {
-        todo!()
+        unsafe {
+            let mut current_node = self.back;
+            let mut index = self.len as i64 - 1;
+
+            while let Some(node) = current_node {
+                if (*node.as_ptr()).elem == elem {
+                    return index;
+                }
+                current_node = (*node.as_ptr()).front;
+                index -= 1
+            }
+            -1
+        }
     }
 
     /// Removes all elements from the list
     pub fn clear(&mut self) {
-        todo!()
+        while self.len != 0 {
+            let _ = self.delete(0);
+        }
     }
 
     /// Copies all elements from `other` to the end of the list
     pub fn extend(&mut self, other: &List) {
-        todo!()
+        for index in 0..other.len {
+            self.append(other.get(index).unwrap());
+        }
     }
 }
 
 impl Clone for List {
     /// Returns a copy of the list
     fn clone(&self) -> Self {
-        todo!()
+        let mut copy = Self::new();
+        for index in 0..self.len {
+            copy.append(self.get(index).unwrap())
+        }
+        copy
     }
 }
 
