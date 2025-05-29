@@ -254,6 +254,12 @@ impl Clone for List {
     }
 }
 
+impl Drop for List {
+    fn drop(&mut self) {
+        self.clear()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
