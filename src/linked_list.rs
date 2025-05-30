@@ -1,89 +1,109 @@
 use std::fmt::Debug;
 
-pub struct List {}
+pub struct List {
+    vec: Vec<char>,
+}
 
 impl List {
     /// Creates an empty list
     pub fn new() -> Self {
-        todo!()
+        Self { vec: Vec::new() }
     }
 
     /// Returns the length of the list
     pub fn length(&self) -> usize {
-        todo!()
+        self.vec.len()
     }
 
     /// Appends `elem` to the back of the list
     pub fn append(&mut self, elem: char) {
-        todo!()
+        self.vec.push(elem);
     }
 
     /// Inserts `elem` at position `index` of the list
     /// # Errors
     /// Returns an error if `index > len`
     pub fn insert(&mut self, elem: char, index: usize) -> Result<(), String> {
-        todo!()
+        if index > self.length() {
+            return Err("Index out of bounds".to_string());
+        }
+        self.vec.insert(index, elem);
+        Ok(())
     }
 
     /// Deletes element at position `index` of the list
     /// # Errors
     /// Returns an error if `index` is out of bounds
     pub fn delete(&mut self, index: usize) -> Result<char, String> {
-        todo!()
+        if index >= self.length() {
+            return Err("Index out of bounds".to_string());
+        }
+        Ok(self.vec.remove(index))
     }
 
     /// Deletes all occurences of `elem` in the list
     pub fn delete_all(&mut self, elem: char) {
-        todo!()
+        self.vec.retain(|&x| x != elem);
     }
 
     /// Returns the element at position `index` of the list
     /// # Errors
     /// Returns an error if `index` is out of bounds
     pub fn get(&self, index: usize) -> Result<char, String> {
-        todo!()
+        self.vec
+            .get(index)
+            .copied()
+            .ok_or("Index out of bounds".to_string())
     }
 
     /// Reverses the list
     pub fn reverse(&mut self) {
-        todo!()
+        self.vec.reverse();
     }
 
     /// Returns the position of the first occurrence of `elem` in the list
     ///
     /// If there were no occurrences of `elem`, returns `-1`
     pub fn find_first(&self, elem: char) -> i64 {
-        todo!()
+        match self.vec.iter().position(|&x| x == elem) {
+            None => -1,
+            Some(index) => index as i64,
+        }
     }
 
     /// Returns the position of the last occurrence of `elem` in the list
     ///
     /// If there were no occurrences of `elem`, returns `-1`
     pub fn find_last(&self, elem: char) -> i64 {
-        todo!()
+        match self.vec.iter().rposition(|&x| x == elem) {
+            None => -1,
+            Some(index) => index as i64,
+        }
     }
 
     /// Removes all elements from the list
     pub fn clear(&mut self) {
-        todo!()
+        self.vec.clear();
     }
 
     /// Copies all elements from `other` to the end of the list
     pub fn extend(&mut self, other: &List) {
-        todo!()
+        self.vec.extend(&other.vec);
     }
 }
 
 impl Clone for List {
     /// Returns a copy of the list
     fn clone(&self) -> Self {
-        todo!()
+        Self {
+            vec: self.vec.clone(),
+        }
     }
 }
 
 impl Debug for List {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        f.debug_list().entries(self.vec.iter()).finish()
     }
 }
 
