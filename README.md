@@ -47,4 +47,4 @@ cargo test
 As instructed, this repository contains a commit with [a failed CI build](https://github.com/vitaliichyhryn/sdmt_lab_2/commit/640bdabdee9962a4ae54d43e08dc1fe62e5f657d).
 
 ## Conclusions
-TODO
+I decided to go with test-driven development for this assignment, which meant writing the unit tests first and then coding the actual implementation to make those tests pass. The main benefit, in my opinion, is that if the tests pass, you can be pretty confident that your code is functioning as it's supposed to. I also think it's a very nice way to catch regressions, especially when performing significant refactors of the codebase. Overall, it made the whole development process feel smooth and more structured, though it took a bit more effort upfront to write the tests first.
